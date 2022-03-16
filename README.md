@@ -1,2 +1,3 @@
 # item-stoarge-api
-Api built SpringBoot
+Api built on SpringBoot framework with basic CRUD operations
+
