@@ -17,9 +17,9 @@ import org.springframework.test.web.servlet.post
 
 @SpringBootTest
 @AutoConfigureMockMvc
-internal class StorageControllerTest(
-    @Autowired val mockMvc: MockMvc,
-    @Autowired var objectMapper: ObjectMapper
+internal class StorageControllerTest @Autowired constructor(
+    val mockMvc: MockMvc,
+    var objectMapper: ObjectMapper
     )
 {
     val baseUrl = "/api/storage"
@@ -83,15 +83,33 @@ internal class StorageControllerTest(
 
         @Test
         fun `Adds new item to storage`(){
-            val item = Storage(999, "test", "9999")
-            mockMvc.post(baseUrl) {
+            val nItem = Storage(999, "test", "9999")
+            val tryPost = mockMvc.post(baseUrl) {
                 contentType = MediaType.APPLICATION_JSON
-                content = objectMapper
+                content = objectMapper.writeValueAsString(nItem)
             }
+            tryPost
                 .andDo { print() }
                 .andExpect {
                     status { isCreated() }
+                    content { contentType(MediaType.APPLICATION_JSON) }
+                    jsonPath("$.id") { value(999) }
+                    jsonPath("$.name") { value("test") }
+                    jsonPath("$.number") { value("9999") }
                 }
+        }
+
+        @Test
+        fun `Returns BAD REQUEST if id already in storage`(){
+            val invalid = Storage(1, "omg", "0001")
+            val tryPost = mockMvc.post(baseUrl) {
+                contentType = MediaType.APPLICATION_JSON
+                content = objectMapper.writeValueAsString(invalid)
+            }
+
+            tryPost
+                .andDo { print() }
+                .andExpect { status { isBadRequest() } }
         }
     }
 }

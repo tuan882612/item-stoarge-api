@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class MockItemDataSource: ItemDataSource {
-    val items = listOf(
+    val items = mutableListOf(
         Storage(1, "omg", "0001"),
         Storage(2, "okay", "0012"),
         Storage(3, "wow", "0023"),
@@ -16,4 +16,12 @@ class MockItemDataSource: ItemDataSource {
 
     override fun retrieveItem(id: Int): Storage =
         items.firstOrNull() { it.id == id } ?: throw NoSuchElementException("No such item with id: $id exist in storage")
+
+    override fun createItem(item: Storage): Storage {
+        if(items.any { it.id == item.id}) {
+            throw IllegalArgumentException("Item ${item.id} already exist in storage")
+        }
+        items.add(item)
+        return item
+    }
 }
