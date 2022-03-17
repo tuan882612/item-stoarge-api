@@ -17,6 +17,7 @@ import org.junit.jupiter.api.TestInstance
 internal class StorageControllerTest {
     @Autowired
     lateinit var mockMvc: MockMvc
+    val baseUrl = "/api/storage"
 
     @Nested
     @DisplayName("retrieveItems()")
@@ -24,31 +25,41 @@ internal class StorageControllerTest {
     inner class RetrieveItems {
         @Test
         fun `should return all items`(){
-            mockMvc.get("/api/storage")
+            mockMvc.get(baseUrl)
                 .andDo { print() }
                 .andExpect {
                     status { isOk() }
                     content { contentType(MediaType.APPLICATION_JSON) }
-                    jsonPath("$[0].id"){ value(1) }
+                    jsonPath("$[0].id"){ value("1") }
                 }
         }
     }
 
     @Nested
-    @DisplayName("retrieveItems()")
+    @DisplayName("retrieveItem()")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    inner class RetrieveItem{
+    inner class RetrieveItem {
         @Test
         fun `should return the item with the given id`(){
             val id = 1
-            mockMvc.get("/api/storage/$id")
+            mockMvc.get("$baseUrl/$id")
                 .andDo { print() }
                 .andExpect {
                     status { isOk() }
                     content { contentType(MediaType.APPLICATION_JSON) }
                     jsonPath("$.number") { value("0001")}
+                    jsonPath("$.name") { value("omg")}
                 }
         }
+
+        @Test
+        fun `should return NOT FOUND if the id does not exist`(){
+            val id = "does_not_exist"
+            mockMvc.get("$baseUrl/$id")
+                .andDo { print() }
+                .andExpect { status { isNotFound() } }
+        }
     }
+
 
 }

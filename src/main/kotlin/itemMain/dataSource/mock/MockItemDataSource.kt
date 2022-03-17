@@ -6,13 +6,13 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class MockItemDataSource: ItemDataSource {
-    val item = listOf(
+    val items = listOf(
         Storage(1, "omg", "0001"),
         Storage(2, "okay", "0012"),
         Storage(3, "wow", "0023"),
     )
 
-    override fun retrieveItems(): Collection<Storage> = item
+    override fun retrieveItems(): Collection<Storage> = items
 
-    override fun retrieveItem(id: Int): Storage = item.first { it.id == id }
+    override fun retrieveItem(id: Int): Storage = items.first { it.id == id }
 }
