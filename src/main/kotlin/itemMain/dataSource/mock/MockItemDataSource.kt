@@ -14,5 +14,6 @@ class MockItemDataSource: ItemDataSource {
 
     override fun retrieveItems(): Collection<Storage> = items
 
-    override fun retrieveItem(id: Int): Storage = items.first { it.id == id }
+    override fun retrieveItem(id: Int): Storage =
+        items.firstOrNull() { it.id == id } ?: throw NoSuchElementException("No such item with id: $id exist in storage")
 }

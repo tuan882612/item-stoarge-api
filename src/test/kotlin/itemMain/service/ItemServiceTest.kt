@@ -11,7 +11,7 @@ internal class ItemServiceTest {
     private val itemService = ItemService(dataSource)
 
     @Test
-    fun `Should call its data source to retrieve items`(){
+    fun `Data source called to retrieve items`(){
         itemService.retrieveItems()
         verify(exactly = 1) { dataSource.retrieveItems() }
     }

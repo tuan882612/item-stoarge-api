@@ -1,5 +1,7 @@
 package itemMain.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import itemMain.dataLayer.Storage
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -11,20 +13,24 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.TestInstance
+import org.springframework.test.web.servlet.post
 
 @SpringBootTest
 @AutoConfigureMockMvc
-internal class StorageControllerTest {
-    @Autowired
-    lateinit var mockMvc: MockMvc
+internal class StorageControllerTest(
+    @Autowired val mockMvc: MockMvc,
+    @Autowired var objectMapper: ObjectMapper
+    )
+{
     val baseUrl = "/api/storage"
 
     @Nested
-    @DisplayName("retrieveItems()")
+    @DisplayName("GET /api/storage")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class RetrieveItems {
+
         @Test
-        fun `should return all items`(){
+        fun `Return all items`(){
             mockMvc.get(baseUrl)
                 .andDo { print() }
                 .andExpect {
@@ -36,11 +42,12 @@ internal class StorageControllerTest {
     }
 
     @Nested
-    @DisplayName("retrieveItem()")
+    @DisplayName("GET /api/storage/{id}")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class RetrieveItem {
+
         @Test
-        fun `should return the item with the given id`(){
+        fun `Returns item with the given id`(){
             val id = 1
             mockMvc.get("$baseUrl/$id")
                 .andDo { print() }
@@ -53,13 +60,38 @@ internal class StorageControllerTest {
         }
 
         @Test
-        fun `should return NOT FOUND if the id does not exist`(){
-            val id = "does_not_exist"
+        fun `Returns NOT FOUND if the id does not exist`(){
+            val id = "-1"
             mockMvc.get("$baseUrl/$id")
                 .andDo { print() }
                 .andExpect { status { isNotFound() } }
         }
+
+        @Test
+        fun `Returns BAD REQUEST if the id does not match format`(){
+            val id = "w"
+            mockMvc.get("$baseUrl/$id")
+                .andDo { print() }
+                .andExpect { status { isBadRequest() } }
+        }
     }
 
+    @Nested
+    @DisplayName("POST /api/storage")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class AddItem {
 
+        @Test
+        fun `Adds new item to storage`(){
+            val item = Storage(999, "test", "9999")
+            mockMvc.post(baseUrl) {
+                contentType = MediaType.APPLICATION_JSON
+                content = objectMapper
+            }
+                .andDo { print() }
+                .andExpect {
+                    status { isCreated() }
+                }
+        }
+    }
 }
