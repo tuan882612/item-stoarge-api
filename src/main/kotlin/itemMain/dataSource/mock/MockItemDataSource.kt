@@ -24,4 +24,11 @@ class MockItemDataSource: ItemDataSource {
         items.add(item)
         return item
     }
+
+    override fun updateItem(item: Storage): Storage {
+        val curItem = items.firstOrNull { it.id == item.id } ?: throw NoSuchElementException("Could not find item with id ${item.id}")
+        items.remove(curItem)
+        items.add(item)
+        return item
+    }
 }

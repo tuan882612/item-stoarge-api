@@ -8,4 +8,6 @@ interface ItemDataSource {
     fun retrieveItem(id: Int): Storage
 
     fun createItem(item: Storage): Storage
+
+    fun updateItem(item: Storage): Storage
 }
