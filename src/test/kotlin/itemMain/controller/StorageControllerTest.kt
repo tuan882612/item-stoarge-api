@@ -20,6 +20,8 @@ internal class StorageControllerTest @Autowired constructor(
     )
 {
     val baseUrl = "/api/storage"
+    val baseId = 1
+    val dne = -1
 
     @Nested
     @DisplayName("GET /api/storage")
@@ -33,7 +35,7 @@ internal class StorageControllerTest @Autowired constructor(
                 .andExpect {
                     status { isOk() }
                     content { contentType(MediaType.APPLICATION_JSON) }
-                    jsonPath("$[0].id"){ value("1") }
+                    jsonPath("$[0].id"){ value(baseId) }
                 }
         }
     }
@@ -45,7 +47,7 @@ internal class StorageControllerTest @Autowired constructor(
 
         @Test
         fun `Returns item with the given id`(){
-            val item = Storage(1, "0001", "omg")
+            val item = Storage(baseId, "0001", "omg")
             mockMvc.get("$baseUrl/${item.id}")
                 .andDo { print() }
                 .andExpect { status { isOk() } }
@@ -53,8 +55,7 @@ internal class StorageControllerTest @Autowired constructor(
 
         @Test
         fun `Returns NOT FOUND if the id does not exist`(){
-            val id = "-1"
-            mockMvc.get("$baseUrl/$id")
+            mockMvc.get("$baseUrl/$dne")
                 .andDo { print() }
                 .andExpect { status { isNotFound() } }
         }
@@ -96,7 +97,7 @@ internal class StorageControllerTest @Autowired constructor(
 
         @Test
         fun `Returns BAD REQUEST if id already in storage`(){
-            val invalid = Storage(1, "omg", "0001")
+            val invalid = Storage(baseId, "omg", "0001")
             val tryPost = mockMvc.post(baseUrl) {
                 contentType = MediaType.APPLICATION_JSON
                 content = objectMapper.writeValueAsString(invalid)
@@ -111,11 +112,11 @@ internal class StorageControllerTest @Autowired constructor(
     @Nested
     @DisplayName("PATCH /api/storage")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    inner class UpdateStorage {
+    inner class UpdateItem {
 
          @Test
          fun `Updates an existing item`(){
-             val updatedItem = Storage(1, "omg", "0013")
+             val updatedItem = Storage(baseId, "omg", "0013")
              val performPatch = mockMvc.patch(baseUrl) {
                  contentType = MediaType.APPLICATION_JSON
                  content = objectMapper.writeValueAsString(updatedItem)
@@ -137,7 +138,7 @@ internal class StorageControllerTest @Autowired constructor(
 
         @Test
         fun `Returns BAD REQUEST if item with given id does not exist`(){
-            val item = Storage(-1, "test", "9999")
+            val item = Storage(dne, "test", "9999")
             val performPatch = mockMvc.patch(baseUrl){
                 contentType = MediaType.APPLICATION_JSON
                 content = objectMapper.writeValueAsString(item)
@@ -149,4 +150,26 @@ internal class StorageControllerTest @Autowired constructor(
         }
     }
 
+    @Nested
+    @DisplayName("DELETE /api/storage/{id}")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class DeleteItem {
+
+        @Test
+        fun `Deletes item with given id`() {
+            mockMvc.delete("$baseUrl/$baseId")
+                .andDo { print() }
+                .andExpect { status { isNoContent() } }
+
+            mockMvc.get("$baseUrl/$baseId")
+                .andExpect { status { isNotFound() } }
+        }
+
+        @Test
+        fun `Returns NOT FOUND item with id does not exist`(){
+            mockMvc.delete("$baseUrl/$dne")
+                .andDo { print() }
+                .andExpect { status { isNotFound() } }
+        }
+    }
 }

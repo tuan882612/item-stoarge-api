@@ -10,4 +10,6 @@ interface ItemDataSource {
     fun createItem(item: Storage): Storage
 
     fun updateItem(item: Storage): Storage
+
+    fun deleteItem(id: Int)
 }

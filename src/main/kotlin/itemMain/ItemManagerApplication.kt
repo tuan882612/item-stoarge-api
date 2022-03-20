@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController
 @SpringBootApplication
 @RestController
 class ItemManagerApplication {
+
 	@GetMapping
 	fun helloWorld(): String = "Hello this the main output"
 }

@@ -31,4 +31,15 @@ class MockItemDataSource: ItemDataSource {
         items.add(item)
         return item
     }
+
+    override fun deleteItem(id: Int) {
+        items.firstOrNull { it.id == id} ?: throw NoSuchElementException("No such item with id: $id exist in storage")
+
+        items.forEachIndexed { index, value ->
+            if(id == value.id){
+                items.removeAt(index)
+                return
+            }
+        }
+    }
 }

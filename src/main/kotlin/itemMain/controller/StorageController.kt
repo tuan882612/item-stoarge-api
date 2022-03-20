@@ -29,5 +29,9 @@ class StorageController(private val service: ItemService) {
     fun addItem(@RequestBody item: Storage): Storage = service.addItem(item)
 
     @PatchMapping
-    fun updateStorage(@RequestBody item:Storage): Storage = service.updateItem(item)
+    fun updateStorage(@RequestBody item: Storage): Storage = service.updateItem(item)
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteItem(@PathVariable id: Int): Unit = service.deleteItem(id)
 }
